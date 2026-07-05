@@ -1,0 +1,24 @@
+workflows:
+  android-build:
+    name: Android Build
+    instance_type: linux_x2
+    max_build_duration: 60
+    environment:
+      java: 17
+    scripts:
+      - name: Unzip project
+        script: |
+          unzip -o AppWrap-1.zip -d _src
+      - name: Find project folder
+        script: |
+          echo "PROJECT_DIR=$(dirname $(find _src -name settings.gradle.kts | head -1))" >> $CM_ENV
+      - name: Create gradle wrapper
+        script: |
+          cd "$PROJECT_DIR"
+          gradle wrapper --gradle-version 8.9
+      - name: Build APK
+        script: |
+          cd "$PROJECT_DIR"
+          ./gradlew assembleDebug
+    artifacts:
+      - '**/outputs/**/*.apk'
